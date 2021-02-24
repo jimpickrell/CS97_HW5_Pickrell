@@ -31,11 +31,11 @@ struct my_options * get_options(struct my_options *s, int argc, char** argv, int
     else 
     {
         // create options with default values
+        s->verbose_output=0;             // false
         if(s->verbose_output)printf("my_options: Create options argc = %d\n", argc);
         s->input_file=strdup("rdrand");  // -i default value
         s->nbytes=0;                     // positional argument default value
         s->nbytes_per_line=0;            // -o default value
-        s->verbose_output=0;             // false
     }
 
     while ((c = getopt(argc, argv, "vi:o:")) != -1) {
