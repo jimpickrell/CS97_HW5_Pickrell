@@ -177,9 +177,29 @@ int main (int argc, char **argv)
         this_line_length = nbytes_total - nwritten;
         if (this_line_length>nbytes_per_line) this_line_length = nbytes_per_line;
 
-        for(i=0; i<this_line_length; i++) {
-            putchar(str[i]);
-        }
+
+        //  for(i=0; i<this_line_length; i++) {
+        //      putchar(str[i]);
+        //  }
+
+        // I want to test if write is faster than putchar
+
+        write(1, str, this_line_length);
+
+        // test is time ./randall -i /dev/urandom 133562368 > /dev/null
+        
+        // Results with putchar
+        // real	0m30.721s
+        // user	0m12.819s
+        // sys	0m14.746s
+    
+        // Results with write
+        // real	0m16.786s
+        // user	0m1.523s
+        // sys	0m12.722s
+
+        // So in fact write is faster
+
         nwritten = nwritten + this_line_length;
         if(s.verbose_output)printf("[%d bytes]\n", this_line_length);
     }

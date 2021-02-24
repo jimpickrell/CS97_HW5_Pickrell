@@ -149,3 +149,37 @@ This forces it to use software generation of the random values.
 
 I made a couple of small changes, then pushed it back to the archive and loaded it back
 onto the Mac.  There I tested again and then generated the correct tar files, to upload.
+
+
+Speet Testing
+
+I want to see if replacing putchar will speed up the function.  To make this as fast as possible
+I did this in the body of main, to avoid unnecessary function calls.  I also compiled without
+various debugging options that at this point aren't really needed and may potentially slow
+down the program.
+
+To accelerate output in randall.c, I replaced these lines:
+
+   //  for(i=0; i<this_line_length; i++) {
+   //      putchar(str[i]);
+   //  }
+
+With this line:
+
+   write(1, str, this_line_length);
+
+The test is using the software option since my Mac doesn't have the hardware capability.
+
+   time ./randall -i /dev/urandom 133562368 > /dev/null
+        
+Results with putchar
+real	0m30.721s
+user	0m12.819s
+sys	0m14.746s
+    
+Results with write
+real	0m16.786s
+user	0m1.523s
+sys	0m12.722s
+
+So in fact using "write" is faster than outputting our buffer with putchar.
