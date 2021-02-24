@@ -82,8 +82,9 @@ myfiles = \
 	rand64-hw.c rand64-hw.h \
 	rand64-sw.c rand64-sw.h \
 	output.c output.h \
+	cpu_check.c cpu_check.h \
 	notes.txt \
-	MAKEFILE
+	Makefile
 
 submission: $(myfiles)
 	tar -czf randall-submission.tgz $(myfiles)
