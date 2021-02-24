@@ -2,3 +2,150 @@ Jim Pickrell
 600522129
 jimp@ucla.edu
 jim.pickrell@gmail.com
+
+CS97 HW 5 Notes
+
+The assignment is located here:
+http://web.cs.ucla.edu/classes/winter21/cs97-1/assign/assign5.html
+
+
+Reorganize code
+
+We have a program randall.c and a Makefile to go with it.
+
+First see if it compiles.  I'm doing this on an Ubuntu machine on AWS, and on my Mac at home.
+
+The note in the code says to use the option -mdrnd, so that is what I will do:
+
+The linux command to unpack this is
+
+tar Jxvf file.txz
+
+On the Mac you just double click and it unpacks.
+
+I will try this homework on the Mac first.
+
+I took the original file and marked off the sections for various files:
+
+cpu_check.c	output.c	rand64-hw.c	rand64-sw.c	randall.c
+cpu_check.h	output.h	rand64-hw.h	rand64-sw.h	randall.h
+
+I removed the "static" command from the function names, because this prevents linking.
+
+I added the #ifndef #define #endif commands to each h file.
+
+I then compiled each of the c files to make sure they would compile.
+
+Note that the -mrdrnd" option is required to compile rand64-hw.c.  The others don't need it.
+Next I compiled and linked the whole project:
+
+$ gcc -mrdrnd *.c
+
+Then I tested it as a.out, which seemed fine.
+$ ./a.out
+./a.out: usage: ./a.out NBYTES
+
+So far, so good.  Let's build a make file.
+
+Makefile
+
+I created an "all" section in the makefile as follows:
+
+ 
+all: cpu_check.o output.o rand64-hw.o rand64-sw.o randall.o
+   gcc -o randall cpu_check.o output.o rand64-hw.o rand64-sw.o randall.o
+ 
+cpu_check.o: cpu_check.c
+   gcc -c cpu_check.c -o cpu_check.o
+ 
+output.o: output.c
+   gcc -c output.c -o output.o
+ 
+rand64-hw.o: rand64-hw.c
+   gcc -c  -mrdrnd rand64-hw.c -o rand64-hw.o
+ 
+rand64-sw.o: rand64-sw.c
+   gcc -c rand64-sw.c -o rand64-sw.o
+ 
+randall.o: randall.c
+   gcc -c randall.c -o randall.o
+
+To keep things simple, I explicitly listed filenames and options for the compile.  To keep the 
+code compact, I dropped the options that weren't required for compilation.  Each o file is 
+recreated any time the corresponding c file is changed.  The project is relinked any time any 
+of the o files is changed.  To test this I made a couple of changes to c files and confirmed 
+that the project was correctly compiled and linked.
+
+The key code segments that create the tar files follow:
+
+myfiles = \
+	options.c options.h \
+	randall.c randall.h \
+	rand64-hw.c rand64-hw.h \
+	rand64-sw.c rand64-sw.h \
+	output.c output.h \
+	notes.txt \
+	MAKEFILE
+
+submission: $(myfiles)
+	tar -czf randall-submission.tgz $(myfiles)
+
+gitsubmission: randall-submission.tgz
+	tar -czf randall-git.tgz .git
+
+
+
+getopt
+
+The spec requests named -i and -o options, as well as n which is positional.  The easiest way t
+o do this is with getopt, which is pretty similar to what we used in a previous project in Python.
+
+The options are read with the following code in options.c
+
+   while ((c = getopt(argc, argv, "vi:o:")) != -1) {
+        if(s->verbose_output)printf("User selected option %c\n",c);
+        (process the options)
+        }
+
+The colon after i and o means that these have an argument which follows.
+
+The values are returned to my main routine in a struct called "my_options".  This is initialized 
+at program start and then destroyed at program end.
+
+
+Git archive
+
+The spec requires us to build a git archive.  I created this on github, with an appropriate 
+gitignore, then cloned it to my hard disk.
+
+git clone https://github.com/jimpickrell/CS97_HW5_Pickrell.git
+
+I copied all the relevant files like this
+
+git add *
+git commit -m "adding files"
+git push
+
+
+Tar archives
+
+These are created in the Makefile with "make submission" and "make gitsubmission" as 
+described earlier.
+
+
+Testing on Linux
+
+I uploaded everything to the main git archive and hten cloned it onto Linux.
+
+Note: my linux computer has the hardware acceleration so you can test without setting input:
+
+./randall 5
+
+The mac doesn't have this so you need to try something like:
+
+./randall -i mrand48_r 7
+
+This forces it to use software generation of the random values.
+
+I made a couple of small changes, then pushed it back to the archive and loaded it back
+onto the Mac.  There I tested again and then generated the correct tar files, to upload.
