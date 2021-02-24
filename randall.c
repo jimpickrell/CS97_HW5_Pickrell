@@ -52,7 +52,8 @@ int main (int argc, char **argv)
 
   // Check arguments.  
   bool valid = false;
-  long long nbytes, nbytes_per_line;
+  long long nbytes_total; 
+  long long nbytes_per_line;
   int index;
   int c;
   int n;
@@ -81,10 +82,11 @@ int main (int argc, char **argv)
 */
 
     // confirm that this worked
-    nbytes = s.nbytes;
-    if(s.verbose_output)printf("randall: bytes to print =  %lld\n", nbytes);
+    nbytes_total = s.nbytes;
+    if(s.verbose_output)printf("randall: bytes to print =  %lld\n", nbytes_total);
   
     nbytes_per_line = s.nbytes_per_line;
+    if(nbytes_per_line == 0) nbytes_per_line = s.nbytes;
     if(s.verbose_output)printf("randall: bytes to print per line =  %lld\n", nbytes_per_line);
 
     //if(s.verbose_output)
@@ -157,7 +159,7 @@ int main (int argc, char **argv)
     char *str = (char *)malloc((size_t)buffer_size);
     int * buffer = (int *)str;
     int nwritten = 0;
-    int nleft;
+    int this_line_length;
     int j=0;
     
     do {
@@ -172,16 +174,16 @@ int main (int argc, char **argv)
         }
 
         // Calculate how many should actually be written
-        nleft = nbytes - nwritten;
-        if (nleft>nbytes_per_line) nleft = nbytes_per_line;
+        this_line_length = nbytes_total - nwritten;
+        if (this_line_length>nbytes_per_line) this_line_length = nbytes_per_line;
 
-        for(i=0; i<nleft; i++) {
+        for(i=0; i<this_line_length; i++) {
             putchar(str[i]);
         }
-        nwritten = nwritten + nleft;
-        if(s.verbose_output)printf("[%d bytes]\n", nleft);
+        nwritten = nwritten + this_line_length;
+        if(s.verbose_output)printf("[%d bytes]\n", this_line_length);
     }
-    while (nwritten < nbytes);
+    while (nwritten < nbytes_total);
 
     //// end of rewrite
 /*
@@ -204,7 +206,7 @@ int main (int argc, char **argv)
         perror ("output");
     }
 
-    finalize ();  // close files or whatever
+    finalize ();  // close files or devices
     free(str); // output buffer needs to be freed
     get_options(&s, argc, argv, DESTROY);  // free options object
 

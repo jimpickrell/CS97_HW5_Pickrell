@@ -1,0 +1,10 @@
+#!/bin/bash
+#a=$(./randall 5 | wc -c); 
+# my computer will fail this test because no hardware randome feature
+# so I am using a different test
+a=$(./randall -i /dev/urandom 5 | wc -c)
+
+if [ $a -eq 5 ];
+	then echo "success"; 
+	else echo "fail" 
+fi
